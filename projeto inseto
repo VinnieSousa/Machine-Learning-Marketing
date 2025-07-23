@@ -1,0 +1,68 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+from PIL import Image
+import random
+from torchvision import transforms
+# Caminho base do dataset
+base_dir = ("C:/Users/ovinn/Documents/Projetos/Tabelas/pest")
+
+# Diretórios de treino e teste
+train_dir = os.path.join(base_dir, "train")
+test_dir = os.path.join(base_dir, "test")
+# Listar as classes (espécies de insetos)
+classes_train = os.listdir(train_dir)
+classes_test = os.listdir(test_dir)
+
+# Contar imagens por espécie
+def contar_imagens(pasta_base):
+    contagem = {}
+    for classe in os.listdir(pasta_base):
+        caminho_classe = os.path.join(pasta_base, classe)
+        if os.path.isdir(caminho_classe):  # Garante que é uma pasta
+            contagem[classe] = len(os.listdir(caminho_classe))
+    return contagem
+
+contagem_train = contar_imagens(train_dir)
+contagem_test = contar_imagens(test_dir)
+
+print("Classes no conjunto de treino:", classes_train)
+print("Número de imagens por classe (treino):", contagem_train)
+print("\nClasses no conjunto de teste:", classes_test)
+print("Número de imagens por classe (teste):", contagem_test)
+
+# Escolher um conjunto (train ou test)
+conjunto = "train"  # Ou "test"
+
+# Listar as espécies dentro do conjunto escolhido
+caminho_conjunto = os.path.join(base_dir, conjunto)
+especies = os.listdir(caminho_conjunto)
+
+# Escolher uma espécie aleatória
+especie_escolhida = random.choice(especies)
+
+# Listar imagens dentro da pasta da espécie escolhida
+caminho_especie = os.path.join(caminho_conjunto, especie_escolhida)
+imagens_especie = os.listdir(caminho_especie)
+
+# Escolher uma imagem aleatória dessa espécie
+img_escolhida = random.choice(imagens_especie)
+
+# Abrir e exibir a imagem
+img_path = os.path.join(caminho_especie, img_escolhida)
+img = Image.open(img_path)
+
+plt.imshow(img)
+plt.axis("off")
+plt.title(f"Especies: {especie_escolhida}")
+plt.show()
+
+transformacao = transforms.Compose([
+    transforms.Resize((128, 128)),  # Redimensiona para 128x128 pixels
+    transforms.ToTensor(),  # Converte para tensor
+])
+
+img_t = transformacao(img)
+print(img_t.shape)  # Saída: (Canais, Altura, Largura)
